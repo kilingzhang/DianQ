@@ -9,6 +9,8 @@
 namespace App\Core;
 
 
+use App\Support\Log;
+use App\Support\Time;
 use CoolQSDK\CoolQBase;
 use CoolQSDK\Response;
 use CoolQSDK\Url;
@@ -21,20 +23,33 @@ class CoolQ extends CoolQBase implements PluginSubject
 
     private static $plugins = array();
     private $postType;
-    private $block = false;
+    public $block = false;
 
     public function curl($uri = Url::get_version_info, $param = [], $method = 'GET')
     {
+        $starttime = Time::getMicrotime();
         try {
 
             $response = self::$client->request($method, $uri, array_merge(self::$options, [
                 'query' => $param
             ]));
+
+            $times = Time::ComMicritime($starttime, Time::getMicrotime());
+            Log::debug($uri . ' 请求总耗时：' . $times . '秒', [
+                'request' => $param,
+                'status' => $response->getStatusCode(),
+                'response' => $response->getBody(),
+            ]);
+
             if ($response->getStatusCode() == 200) {
                 $response = $response->getBody();
                 return Response::ok($response);
             }
+
+
         } catch (ClientException $e) {
+
+            Log::error($uri . ' ClientException： ', $e->getMessage());
             //如果 http_errors 请求参数设置成true，在400级别的错误的时候将会抛出
             switch ($e->getCode()) {
                 case 400:
@@ -62,7 +77,8 @@ class CoolQ extends CoolQBase implements PluginSubject
             }
         } catch (RequestException $e) {
             //在发送网络错误(连接超时、DNS错误等)时，将会抛出 GuzzleHttp\Exception\RequestException 异常。
-            //一般为coolq-http-api插件未开启 接口地址无法访问
+            //一般为coolq-http-api插件未开启 接口地址无法访问  如果docker用户可以检查是否开启端口映射
+            Log::error($uri . ' RequestException： ', $e->getMessage());
             switch ($e->getCode()) {
                 case 0:
                     return Response::pluginServerError();
@@ -78,20 +94,19 @@ class CoolQ extends CoolQBase implements PluginSubject
 
     }
 
-
     public function event()
     {
 
-        $signature = self::server(['HTTP_X_SIGNATURE']);
-        $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
-        //TODO
-        $content = self::put();
-//        $content = json_decode(file_get_contents('./put.json'), true);
-
-        if ($this->isSignature() && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($content, JSON_UNESCAPED_UNICODE), $this->getSecret()) != $signature)) {
-            //TODO sha1验证失败
+        if (!$this->isHMAC()) {
             echo '{"block": true,"reply":"signature=false"}';
-            return;
+            return false;
+        }
+
+        $content = $this->getPutParams();
+
+        if (empty($content)) {
+            echo '{"block": true,"reply":"未接收到任何上报数据!}';
+            return false;
         }
 
         $this->postType = $content['post_type'];
@@ -149,8 +164,6 @@ class CoolQ extends CoolQBase implements PluginSubject
                         ];
 
                         // {"reply":"message","block": true,"at_sender":true}
-                        //todo
-                        //以后再说吧
                         break;
                 }
                 break;
@@ -267,13 +280,13 @@ class CoolQ extends CoolQBase implements PluginSubject
 
     }
 
-
     public function attach(BasePlugin $plugin)
     {
         $key = array_search($plugin, self::$plugins);
         if ($key === false) {
             self::$plugins[] = $plugin;
         }
+        Log::debug($plugin->getPluginName() . '  插件已加载', self::$plugins);
     }
 
     public function detach(BasePlugin $plugin)
@@ -282,34 +295,58 @@ class CoolQ extends CoolQBase implements PluginSubject
         if ($key !== false) {
             unset(self::$plugins[$key]);
         }
+        Log::debug($plugin->getPluginName() . '  插件已注销');
     }
 
     public function notify()
     {
-        // TODO: Implement notify() method.
         foreach (self::$plugins as $plugin) {
             // 把本类对象传给观察者，以便观察者获取当前类对象的信息
             if (!$this->block) {
+                Log::debug('已通知插件 ' . $plugin->getPluginName() . ' ', $this->getContent());
                 switch ($this->postType) {
                     //收到消息
                     case 'message':
-                        $plugin->message($this);
+                        $plugin->onMessage($this);
                         break;
                     //群、讨论组变动等非消息类事件
+                    //兼容4.x
                     case 'notice':
                     case 'event':
-                        $plugin->event($this);
+                        $plugin->onEvent($this);
                         break;
                     //加好友请求、加群请求／邀请
                     case 'request':
-                        $plugin->request($this);
+                        $plugin->onRequest($this);
                         break;
                     default:
-                        $plugin->other($this);
+                        $plugin->onOther($this);
                         break;
                 }
+            } else {
+                break;
             }
+
+            if ($this->block == true) {
+                Log::debug($plugin->getPluginName() . '插件已拦截后续插件', [$this->block]);
+            }
+
         }
         $this->block = false;
     }
+
+
+    public function run()
+    {
+
+        $this->event();
+
+        //框架耗时日志记录
+        $times = Time::ComMicritime(COOLQ_START, Time::getMicrotime());
+        Log::debug('框架总耗时：' . $times . '秒', [$times]);
+        if (getenv('APP_DEBUG') == true && getenv('LOG_LEVEL') != 'DEBUG') {
+            Log::info('框架总耗时：' . $times . '秒', [$times]);
+        }
+    }
+
 }
