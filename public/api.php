@@ -7,12 +7,14 @@
  */
 
 use App\Support\Log;
+use App\Support\Time;
 use Dotenv\Dotenv;
 
 include __DIR__ . '/../vendor/autoload.php';
 
 
 $dotenv = new Dotenv(__DIR__ . '/../');
+
 $dotenv->load();
 
 define('COOLQ_START', \App\Support\Time::getMicrotime());
@@ -22,10 +24,7 @@ define('LOG_PATH', ROOT_PATH . 'storage' . DIRECTORY_SEPARATOR . 'logs' . DIRECT
 
 
 
-Log::setLoggerName(getenv('APP_NAME'));
-Log::setLoggerPath(LOG_PATH);
-Log::info('---------------------------START-----------');
 
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-$app->event();
+$app->run();

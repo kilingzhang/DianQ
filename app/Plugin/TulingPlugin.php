@@ -9,9 +9,10 @@
 namespace App\Plugin;
 
 
-
 use App\Core\BasePlugin;
 use App\Core\CoolQ;
+use App\Support\Log;
+use App\Support\Time;
 use CoolQSDK\CQ;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -39,17 +40,11 @@ class TulingPlugin extends BasePlugin
         parent::__destruct();
     }
 
-    public function update(CoolQ $coolQ)
-    {
 
-    }
 
     public function message(CoolQ $coolQ)
     {
-        // TODO: Implement message() method.
         $content = $coolQ->getContent();
-
-
         switch ($content['message_type']) {
             //私聊消息
             case "private":
@@ -61,6 +56,10 @@ class TulingPlugin extends BasePlugin
 
                 $data = $this->privateTuling($content['user_id'], $content['message']);
                 $data = json_decode($data, true);
+                if (empty($data['results'][0]['values']['text'])) {
+                    //TODO: 返回空值做处理
+                    return;
+                }
                 $coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
 
                 break;
@@ -86,6 +85,12 @@ class TulingPlugin extends BasePlugin
                 if (CQ::isAtMe($message, self::$selfQq) || $content['group_id'] == '647895869') {
                     $data = $this->groupTuling($content['user_id'], $content['group_id'], $content['group_id'], $content['message']);
                     $data = json_decode($data, true);
+
+                    if (empty($data['results'][0]['values']['text'])) {
+                        //TODO: 返回空值做处理
+                        return;
+                    }
+
                     $coolQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
 
                 }
@@ -106,11 +111,15 @@ class TulingPlugin extends BasePlugin
 
                 $data = $this->groupTuling($content['user_id'], $content['discuss_id'], $content['discuss_id'], $content['message']);
                 $data = json_decode($data, true);
+
+                if (empty($data['results'][0]['values']['text'])) {
+                    //TODO: 返回空值做处理
+                    return;
+                }
+
                 $coolQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
 
                 // {"reply":"message","block": true,"at_sender":true}
-                //todo
-                //以后再说吧
                 break;
 
         }
@@ -160,10 +169,17 @@ class TulingPlugin extends BasePlugin
             ],
         ];
 
+        $starttime = Time::getMicrotime();
+
         try {
+
             $response = $this->client->request('POST', $url, [
                 RequestOptions::JSON => $params,
             ]);
+
+            $times = Time::ComMicritime($starttime, Time::getMicrotime());
+            Log::debug('/privateTuling 请求总耗时：' . $times . '秒' , [$times]);
+
 
             if ($response->getStatusCode() == 200) {
                 return $response->getBody();
@@ -202,14 +218,20 @@ class TulingPlugin extends BasePlugin
             ],
         ];
 
+        $starttime = Time::getMicrotime();
+
         try {
             $response = $this->client->request('POST', $url, [
                 RequestOptions::JSON => $params,
             ]);
 
+            $times = Time::ComMicritime($starttime, Time::getMicrotime());
+            Log::debug('/privateTuling 请求总耗时：' . $times . '秒' , [$times]);
+
             if ($response->getStatusCode() == 200) {
                 return $response->getBody();
             }
+
 
         } catch (GuzzleException $e) {
         }
@@ -233,7 +255,7 @@ class TulingPlugin extends BasePlugin
     }
 
 
-    public function PluginName()
+    public function getPluginName()
     {
         return 'TulingPlugin';
     }

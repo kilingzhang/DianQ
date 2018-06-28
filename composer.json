@@ -25,7 +25,8 @@
     "kilingzhang/coolq-php-sdk": "^2.0",
     "monolog/monolog": "^1.23",
     "vlucas/phpdotenv": "^2.4",
-    "illuminate/config": "^5.2"
+    "illuminate/config": "^5.2",
+    "pda/pheanstalk": "^3.1"
   },
   "require-dev": {
     "phpunit/phpunit": "~6.0",

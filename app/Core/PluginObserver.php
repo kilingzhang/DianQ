@@ -12,11 +12,10 @@ namespace App\Core;
 
 interface PluginObserver
 {
-    // 接收到通知的处理方法
-    public function update(CoolQ $coolQ);
 
     public function message(CoolQ $coolQ);
 
+    //notice
     public function event(CoolQ $coolQ);
 
     public function request(CoolQ $coolQ);
