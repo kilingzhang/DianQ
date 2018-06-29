@@ -21,7 +21,7 @@ use GuzzleHttp\RequestOptions;
 class TulingPlugin extends BasePlugin
 {
 
-    private $apiKey = 'acd777bd268347978677e9c48a637c9c';
+    private $apiKey = '';
 
     private $client = null;
 
@@ -31,6 +31,7 @@ class TulingPlugin extends BasePlugin
     {
         //MUST  必须复用父类析构函数
         parent::__construct();
+        $this->apiKey = getenv('TULING_APIKEY');
         $this->client = new Client();
     }
 
