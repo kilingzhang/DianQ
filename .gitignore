@@ -5,6 +5,3 @@ composer.lock
 Resopnse.md
 /tests/put.json
 /tests/logs
-/public/
-!/public/index.php
-!/public/robots.txt
