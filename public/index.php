@@ -1,29 +1,30 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Kilingzhang
- * Date: 2017/6/28
- * Time: 15:53
+ * User: kilingzhang
+ * Date: 2018/6/17
+ * Time: 2:02
  */
 
-namespace CoolQSDK\Tests;
+use App\Support\Log;
+use App\Support\Time;
+use Dotenv\Dotenv;
+
+define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
+define('APP_PATH', ROOT_PATH . 'app' . DIRECTORY_SEPARATOR);
+
+include ROOT_PATH . 'vendor/autoload.php';
 
 
+$dotenv = new Dotenv(ROOT_PATH);
 
-use App\Core\CoolQ;
+$dotenv->load();
 
-require_once __DIR__ . '/../vendor/autoload.php';
+define('LOG_PATH', ROOT_PATH . 'storage' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . getenv('APP_NAME') . '.log');
+define('COOLQ_START', \App\Support\Time::getMicrotime());
 
-$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
-//$CoolQ->setReturnFormat('array');
-//194233857
-//1353693508
-//echo $CoolQ->sendPrivateMsg(1353693508, 194233857, false, true);
-//echo "<pre>";
-var_dump(
 
-    $CoolQ->sendPrivateMsg(1353693508, 194233857, false)
+$app = require_once ROOT_PATH . 'bootstrap/app.php';
 
-);
-
+$app->run();
 

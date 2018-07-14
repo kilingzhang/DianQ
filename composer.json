@@ -1,6 +1,6 @@
 {
   "name": "kilingzhang/DianQ",
-  "description": "点Q ， 让QQ机器人开发简单点",
+  "description": "点Q ，让QQ机器人开发简单点",
   "keywords": [
     "coolq",
     "coolq-http-api",
@@ -22,7 +22,7 @@
   ],
   "require": {
     "php": ">=7.0",
-    "kilingzhang/coolq-php-sdk": "^2.0",
+    "kilingzhang/coolq-php-sdk": "dev-master",
     "monolog/monolog": "^1.23",
     "vlucas/phpdotenv": "^2.4",
     "illuminate/config": "^5.2",
@@ -32,6 +32,12 @@
     "phpunit/phpunit": "~6.0",
     "mockery/mockery": "^1.0"
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/kilingzhang/coolq-php-sdk"
+    }
+  ],
   "autoload": {
     "files": [
     ],

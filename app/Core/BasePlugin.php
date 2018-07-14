@@ -48,7 +48,6 @@ abstract class BasePlugin implements PluginObserver
             $this->coolQ->block = $this->Intercept;
         }
 
-
     }
 
 
@@ -62,9 +61,9 @@ abstract class BasePlugin implements PluginObserver
     {
         $this->coolQ = $coolQ;
         $this->startTime = Time::getMicrotime();
-        $resopnse = $this->message($coolQ);
+        $resopnse = $this->message($this->coolQ->getContent());
         $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒' , [$times]);
+        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
         return $resopnse;
     }
 
@@ -72,9 +71,9 @@ abstract class BasePlugin implements PluginObserver
     {
         $this->coolQ = $coolQ;
         $this->startTime = Time::getMicrotime();
-        $resopnse = $this->event($coolQ);
+        $resopnse = $this->event($this->coolQ->getContent());
         $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒' , [$times]);
+        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
         return $resopnse;
     }
 
@@ -82,9 +81,9 @@ abstract class BasePlugin implements PluginObserver
     {
         $this->coolQ = $coolQ;
         $this->startTime = Time::getMicrotime();
-        $resopnse = $this->request($coolQ);
+        $resopnse = $this->request($this->coolQ->getContent());
         $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒' , [$times]);
+        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
         return $resopnse;
     }
 
@@ -92,9 +91,9 @@ abstract class BasePlugin implements PluginObserver
     {
         $this->coolQ = $coolQ;
         $this->startTime = Time::getMicrotime();
-        $resopnse = $this->other($coolQ);
+        $resopnse = $this->other($this->coolQ->getContent());
         $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒' , [$times]);
+        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
         return $resopnse;
     }
 

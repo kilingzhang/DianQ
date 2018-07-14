@@ -37,11 +37,13 @@ class MusicPlugin extends BasePlugin
     }
 
 
-
-    public function message(CoolQ $coolQ)
+    public function getPluginName()
     {
-        $content = $coolQ->getContent();
+        return 'MusicPlugin';
+    }
 
+    public function message(array $content)
+    {
 
         switch ($content['message_type']) {
             //私聊消息
@@ -53,43 +55,27 @@ class MusicPlugin extends BasePlugin
             case "group":
 
 
-
-
                 break;
             //讨论组消息
             case "discuss":
-
 
 
                 break;
 
         }
 
-
-        $this->setIntercept();
     }
 
-
-    public function event(CoolQ $coolQ)
+    public function event(array $content)
     {
-        // TODO: Implement event() method.
     }
 
-    public function request(CoolQ $coolQ)
+    public function request(array $content)
     {
-        // TODO: Implement request() method.
     }
 
-    public function other(CoolQ $coolQ)
+    public function other(array $content)
     {
-        // TODO: Implement other() method.
     }
-
-
-    public function getPluginName()
-    {
-        return 'MusicPlugin';
-    }
-
 
 }

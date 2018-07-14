@@ -41,17 +41,15 @@ class TulingPlugin extends BasePlugin
         parent::__destruct();
     }
 
-
-
-    public function message(CoolQ $coolQ)
+    public function message(array $content)
     {
-        $content = $coolQ->getContent();
+
         switch ($content['message_type']) {
             //私聊消息
             case "private":
 
                 if (empty($this->apiKey)) {
-                    $coolQ->sendPrivateMsg($content['user_id'], 'No ApiKey');
+                    $this->coolQ->sendPrivateMsg($content['user_id'], 'No ApiKey');
                     return;
                 }
 
@@ -61,23 +59,23 @@ class TulingPlugin extends BasePlugin
                     //TODO: 返回空值做处理
                     return;
                 }
-                $coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
+                $this->coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
 
                 break;
             //群消息
             case "group":
 
                 if (self::getSelfQq() == null) {
-                    $loginInfo = json_decode($coolQ->getLoginInfo(), true);
+                    $loginInfo = json_decode($this->coolQ->getLoginInfo(), true);
                     if ($loginInfo['retcode'] !== 0) {
-                        $coolQ->sendGroupMsg($content['group_id'], '机器人信息获取失败');
+                        $this->coolQ->sendGroupMsg($content['group_id'], '机器人信息获取失败');
                         return;
                     }
                     self::setSelfQq($loginInfo['data']['user_id']);
                 }
 
                 if (empty($this->apiKey)) {
-                    $coolQ->sendGroupMsg($content['group_id'], 'No ApiKey');
+                    $this->coolQ->sendGroupMsg($content['group_id'], 'No ApiKey');
                     return;
                 }
 
@@ -92,7 +90,7 @@ class TulingPlugin extends BasePlugin
                         return;
                     }
 
-                    $coolQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
+                    $this->coolQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
 
                 }
 
@@ -106,7 +104,7 @@ class TulingPlugin extends BasePlugin
 
 
                 if (empty($this->apiKey)) {
-                    $coolQ->sendDiscussMsg($content['discuss_id'], 'No ApiKey');
+                    $this->coolQ->sendDiscussMsg($content['discuss_id'], 'No ApiKey');
                     return;
                 }
 
@@ -118,7 +116,7 @@ class TulingPlugin extends BasePlugin
                     return;
                 }
 
-                $coolQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
+                $this->coolQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
 
                 // {"reply":"message","block": true,"at_sender":true}
                 break;
@@ -129,19 +127,16 @@ class TulingPlugin extends BasePlugin
         $this->setIntercept();
     }
 
-    public function event(CoolQ $coolQ)
+    public function event(array $content)
     {
-        // TODO: Implement event() method.
     }
 
-    public function request(CoolQ $coolQ)
+    public function request(array $content)
     {
-        // TODO: Implement request() method.
     }
 
-    public function other(CoolQ $coolQ)
+    public function other(array $content)
     {
-        // TODO: Implement other() method.
     }
 
     public function privateTuling($userId, $inputText, $inputImage = null, $inputMedia = null, $selfInfo = null)
@@ -179,7 +174,7 @@ class TulingPlugin extends BasePlugin
             ]);
 
             $times = Time::ComMicritime($starttime, Time::getMicrotime());
-            Log::debug('/privateTuling 请求总耗时：' . $times . '秒' , [$times]);
+            Log::debug('/privateTuling 请求总耗时：' . $times . '秒', [$times]);
 
 
             if ($response->getStatusCode() == 200) {
@@ -227,7 +222,7 @@ class TulingPlugin extends BasePlugin
             ]);
 
             $times = Time::ComMicritime($starttime, Time::getMicrotime());
-            Log::debug('/privateTuling 请求总耗时：' . $times . '秒' , [$times]);
+            Log::debug('/privateTuling 请求总耗时：' . $times . '秒', [$times]);
 
             if ($response->getStatusCode() == 200) {
                 return $response->getBody();
@@ -255,9 +250,10 @@ class TulingPlugin extends BasePlugin
         self::$selfQq = $selfQq;
     }
 
-
     public function getPluginName()
     {
         return 'TulingPlugin';
     }
+
+
 }

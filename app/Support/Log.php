@@ -57,6 +57,8 @@ class Log
         try {
             $logger->pushHandler(new StreamHandler(self::$loggerPath, $level));
         } catch (\Exception $e) {
+            echo $e->getMessage();
+            exit();
         }
         self::$loggerInstance = $logger;
     }

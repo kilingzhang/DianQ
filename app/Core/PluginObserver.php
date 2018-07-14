@@ -9,17 +9,16 @@
 namespace App\Core;
 
 
-
 interface PluginObserver
 {
 
-    public function message(CoolQ $coolQ);
+    public function message(array $content);
 
     //notice
-    public function event(CoolQ $coolQ);
+    public function event(array $content);
 
-    public function request(CoolQ $coolQ);
+    public function request(array $content);
 
-    public function other(CoolQ $coolQ);
+    public function other(array $content);
 
 }
