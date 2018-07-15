@@ -116,27 +116,27 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
 
     public function onMessage($content)
     {
-        $this->notify();
+        return $this->notify();
     }
 
     public function onEvent($content)
     {
-        $this->notify();
+        return $this->notify();
     }
 
     public function onNotice($content)
     {
-        $this->notify();
+        return $this->notify();
     }
 
     public function onRequest($content)
     {
-        $this->notify();
+        return $this->notify();
     }
 
     public function onOther($content)
     {
-        $this->notify();
+        return $this->notify();
     }
 
     public function beforEvent()

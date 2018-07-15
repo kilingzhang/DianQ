@@ -59,8 +59,8 @@ class TulingPlugin extends BasePlugin
                     //TODO: 返回空值做处理
                     return;
                 }
-                $this->coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
 
+                $response = $this->coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
                 break;
             //群消息
             case "group":
@@ -174,7 +174,7 @@ class TulingPlugin extends BasePlugin
             ]);
 
             $times = Time::ComMicritime($starttime, Time::getMicrotime());
-            Log::debug('/privateTuling 请求总耗时：' . $times . '秒', [$times]);
+            Log::debug('/privateTuling 请求总耗时：' . $times . '秒', [$times, $response]);
 
 
             if ($response->getStatusCode() == 200) {

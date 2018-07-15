@@ -22,11 +22,9 @@ define('LOG_PATH', ROOT_PATH . 'storage' . DIRECTORY_SEPARATOR . 'logs' . DIRECT
 define('COOLQ_START', \App\Support\Time::getMicrotime());
 
 
-
 $app = require_once ROOT_PATH . 'bootstrap/app.php';
 
-$app = new  CoolQ('47.106.170.39:6700', 'kilingzhang', 'kilingzhang',true);
-//$CoolQ->setIsAsync(true);
-//$CoolQ->setReturnFormat('array');
+
 $app->run();
+
 
