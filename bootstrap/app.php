@@ -13,7 +13,7 @@ $useWs = !empty(getenv('COOLQ_USE_WS')) ? getenv('COOLQ_USE_WS') : getenv('COOLQ
 $useWs = $useWs == 'true' ? true : false;
 
 
-if ($useWs && preg_match("/cli-server/i", php_sapi_name())) {
+if ($useWs && !preg_match("/^cli$/i", php_sapi_name())) {
     die('must be used in PHP CLI mode');
 }
 
