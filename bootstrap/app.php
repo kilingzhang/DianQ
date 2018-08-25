@@ -9,7 +9,6 @@ Log::setLoggerName(getenv('APP_NAME'));
 Log::setLoggerPath(LOG_PATH);
 
 
-
 $useWs = !empty(getenv('COOLQ_USE_WS')) ? getenv('COOLQ_USE_WS') : getenv('COOLQ_USE_HTTP');
 
 $useWs = $useWs == 'true' ? true : false;
@@ -25,7 +24,8 @@ $app = new  CoolQ($host, getenv('COOLQ_TOKEN'), getenv('COOLQ_SECRET'), $useWs);
 //$app->setReturnFormat('array');
 
 $app->setIsWhiteList(getenv('WHITE_LIST') == 'true');
-$app->setIsWhiteList(getenv('BLACK_LIST') == 'true');
+$app->setIsBlackList(getenv('BLACK_LIST') == 'true');
+
 
 $privateWhiteList = explode(',', getenv('PRIVATE_WHITE_LIST'));
 $privateBlackList = explode(',', getenv('PRIVATE_BLACK_LIST'));
@@ -43,7 +43,7 @@ $app->setDiscussWhiteList($discussWhiteList);
 $app->setDiscussBlackList($discussBlackList);
 
 
-//$app->attach(new \App\Plugin\TulingPlugin());
+$app->attach(new \App\Plugin\TulingPlugin());
 $app->attach(new \App\Plugin\GongGongPlugin());
 //$app->attach(new \App\Plugin\MusicPlugin());
 
