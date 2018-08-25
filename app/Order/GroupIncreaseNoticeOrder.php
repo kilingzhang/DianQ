@@ -13,6 +13,7 @@ use App\Core\BaseOrder;
 use App\Support\Msg;
 use CoolQSDK\CoolQ;
 use CoolQSDK\CQ;
+use CoolQSDK\Response;
 
 class GroupIncreaseNoticeOrder extends BaseOrder
 {
@@ -66,6 +67,15 @@ class GroupIncreaseNoticeOrder extends BaseOrder
                 ];
 
                 $coolQ->sendGroupMsgAsync($content['group_id'], CQ::at($content['user_id']) . "\n" . $this->getGongGongGroupIncreaseNotice(), false);
+
+                if ($coolQ->isWhiteList() && !in_array($content['group_id'], $coolQ->getGroupWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if (!$coolQ->isWhiteList() && $coolQ->isBlackList() && in_array($content['group_id'], $coolQ->getGroupBlackList())) {
+                    return Response::banAccountError();
+                }
+
                 $coolQ->sendPrivateMsgAsync($content['user_id'], $this->getGongGongGroupIncreaseNotice(), false);
 
 
@@ -97,7 +107,6 @@ class GroupIncreaseNoticeOrder extends BaseOrder
 
                 break;
         }
-
 
 
     }
