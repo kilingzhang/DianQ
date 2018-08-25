@@ -38,9 +38,10 @@ $discussBlackList = explode(',', getenv('DISCUSS_BLACK_LIST'));
 $app->setPrivateWhiteList($privateWhiteList);
 $app->setPrivateBlackList($privateBlackList);
 $app->setGroupWhiteList($groupWhiteList);
-$app->setGroupWhiteList($groupBlackList);
+$app->setGroupBlackList($groupBlackList);
 $app->setDiscussWhiteList($discussWhiteList);
-$app->setDiscussWhiteList($discussBlackList);
+$app->setDiscussBlackList($discussBlackList);
+
 
 //$app->attach(new \App\Plugin\TulingPlugin());
 $app->attach(new \App\Plugin\GongGongPlugin());
