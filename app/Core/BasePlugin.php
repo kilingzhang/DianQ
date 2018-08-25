@@ -35,7 +35,7 @@ abstract class BasePlugin implements PluginObserver
 {
     public $Intercept;
     private $startTime;
-    public $coolQ = null;
+    public $coolQ;
 
     abstract public function getPluginName();
 

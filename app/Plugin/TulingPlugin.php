@@ -60,7 +60,8 @@ class TulingPlugin extends BasePlugin
                     return;
                 }
 
-                $response = $this->coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
+                $this->coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
+
                 break;
             //群消息
             case "group":
@@ -89,8 +90,9 @@ class TulingPlugin extends BasePlugin
                         //TODO: 返回空值做处理
                         return;
                     }
-
-                    $this->coolQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
+                    if($content['user_id'] == 1353693508){
+                        $this->coolQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
+                    }
 
                 }
 
@@ -116,8 +118,9 @@ class TulingPlugin extends BasePlugin
                     return;
                 }
 
-                $this->coolQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
-
+                if($content['user_id']){
+                    $this->coolQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
+                }
                 // {"reply":"message","block": true,"at_sender":true}
                 break;
 

@@ -40,38 +40,55 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
 
     public function notify()
     {
-        foreach (self::$plugins as $plugin) {
-            // 把本类对象传给观察者，以便观察者获取当前类对象的信息
-            if (!$this->block) {
-                Log::debug('已通知插件 ' . $plugin->getPluginName() . ' ', $this->getPutParams());
-                switch ($this->getPostType()) {
-                    //收到消息
-                    case 'message':
-                        $plugin->onMessage($this);
-                        break;
-                    //群、讨论组变动等非消息类事件
-                    //兼容4.x
-                    case 'notice':
-                    case 'event':
-                        $plugin->onEvent($this);
-                        break;
-                    //加好友请求、加群请求／邀请
-                    case 'request':
-                        $plugin->onRequest($this);
-                        break;
-                    default:
-                        $plugin->onOther($this);
-                        break;
-                }
-            }
 
-            if ($this->block == true) {
-                Log::debug($plugin->getPluginName() . '插件已拦截后续插件', [$this->block]);
+        $pids = array();
+        foreach (self::$plugins as $key => $plugin) {
+
+            $pids[$key] = pcntl_fork();
+            if ($pids[$key] == -1) {
+                Log::error($plugin->getPluginName() . "fork thread failed!");
+            } elseif ($pids[$key]) {
+                pcntl_waitpid($pids[$key], $status);
+                exit();
+            } else {
+                echo $plugin->getPluginName(), "\n";
+                $this->onListener($plugin);
                 break;
             }
-
         }
         $this->block = false;
+
+
+    }
+
+    private function onListener($plugin)
+    {
+        if (!$this->block) {
+            Log::debug('已通知插件 ' . $plugin->getPluginName() . ' ', $this->getPutParams());
+            switch ($this->getPostType()) {
+                //收到消息
+                case 'message':
+                    $plugin->onMessage($this);
+                    break;
+                //群、讨论组变动等非消息类事件
+                //兼容4.x
+                case 'notice':
+                case 'event':
+                    $plugin->onEvent($this);
+                    break;
+                //加好友请求、加群请求／邀请
+                case 'request':
+                    $plugin->onRequest($this);
+                    break;
+                default:
+                    $plugin->onOther($this);
+                    break;
+            }
+        }
+
+        if ($this->block == true) {
+            Log::debug($plugin->getPluginName() . '插件已拦截后续插件', [$this->block]);
+        }
     }
 
     public function run()
@@ -124,10 +141,6 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
         return $this->notify();
     }
 
-    public function onNotice($content)
-    {
-        return $this->notify();
-    }
 
     public function onRequest($content)
     {
@@ -148,4 +161,6 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
     {
 
     }
+
+
 }
