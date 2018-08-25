@@ -36,26 +36,30 @@ abstract class BasePlugin implements PluginObserver
     public $Intercept;
     private $startTime;
     public $coolQ;
+    protected $messageOrders = [];
+    protected $eventOrders = [];
+    protected $requestOrders = [];
+    protected $otherOrders = [];
 
     abstract public function getPluginName();
 
     public function __construct()
     {
-
         $this->Intercept = false;
 
         if (isset($this->coolQ)) {
             $this->coolQ->block = $this->Intercept;
         }
 
+        $this->initOrders();
     }
 
+    public abstract function initOrders();
 
     public function __destruct()
     {
 
     }
-
 
     public function onMessage(CoolQ $coolQ)
     {
@@ -97,7 +101,6 @@ abstract class BasePlugin implements PluginObserver
         return $resopnse;
     }
 
-
     /**
      * @param bool $bool
      */
@@ -118,5 +121,118 @@ abstract class BasePlugin implements PluginObserver
         return $this->Intercept;
     }
 
+    public function attach(string $type, BaseOrder $order)
+    {
+        switch ($type) {
+            case 'message':
+                $key = array_search($order, $this->messageOrders);
+                if ($key === false) {
+                    $this->messageOrders[] = $order;
+                }
+                break;
+            case 'event':
+                $key = array_search($order, $this->eventOrders);
+                if ($key === false) {
+                    $this->eventOrders[] = $order;
+                }
+                break;
+
+            case 'request':
+                $key = array_search($order, $this->requestOrders);
+                if ($key === false) {
+                    $this->requestOrders[] = $order;
+                }
+                break;
+
+            case 'ohter':
+                $key = array_search($order, $this->otherOrders);
+                if ($key === false) {
+                    $this->otherOrders[] = $order;
+                }
+                break;
+        }
+        Log::debug($order->getOrderName() . '  命令已加载');
+    }
+
+    public function detach(string $type, BaseOrder $order)
+    {
+        switch ($type) {
+            case 'message':
+                $key = array_search($order, $this->messageOrders);
+                if ($key !== false) {
+                    unset($this->messageOrders[$key]);
+                }
+                break;
+            case 'event':
+                $key = array_search($order, $this->eventOrders);
+                if ($key !== false) {
+                    unset($this->eventOrders[$key]);
+                }
+                break;
+
+            case 'request':
+                $key = array_search($order, $this->requestOrders);
+                if ($key !== false) {
+                    unset($this->requestOrders[$key]);
+                }
+                break;
+
+            case 'ohter':
+                $key = array_search($order, $this->otherOrders);
+                if ($key !== false) {
+                    unset($this->otherOrders[$key]);
+                }
+                break;
+        }
+        Log::debug($order->getOrderName() . '  命令已卸载');
+    }
+
+    public function runMessageOrders()
+    {
+        foreach ($this->messageOrders as $order) {
+            $order->run($this->coolQ, $this->coolQ->getContent());
+        }
+    }
+
+    public function runEventOrders()
+    {
+        foreach ($this->eventOrders as $order) {
+            $order->run($this->coolQ, $this->coolQ->getContent());
+        }
+    }
+
+    public function runRequestOrders()
+    {
+        foreach ($this->requestOrders as $order) {
+            $order->run($this->coolQ, $this->coolQ->getContent());
+        }
+    }
+
+    public function runOtherOrders()
+    {
+        foreach ($this->otherOrders as $order) {
+            $order->run($this->coolQ, $this->coolQ->getContent());
+        }
+    }
+
+    public function message(array $content)
+    {
+        $this->runMessageOrders();
+    }
+
+    public function event(array $content)
+    {
+        $this->runEventOrders();
+    }
+
+    public function request(array $content)
+    {
+        $this->runRequestOrders();
+    }
+
+    public function other(array $content)
+    {
+        $this->runOtherOrders();
+    }
 
 }

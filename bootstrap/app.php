@@ -42,9 +42,9 @@ $app->setGroupWhiteList($groupBlackList);
 $app->setDiscussWhiteList($discussWhiteList);
 $app->setDiscussWhiteList($discussBlackList);
 
-//$app->attach(new \App\Plugin\GongGongPlugin());
+//$app->attach(new \App\Plugin\TulingPlugin());
+$app->attach(new \App\Plugin\GongGongPlugin());
 //$app->attach(new \App\Plugin\MusicPlugin());
-$app->attach(new \App\Plugin\TulingPlugin());
 
 
 return $app;

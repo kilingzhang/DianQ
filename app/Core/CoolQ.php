@@ -49,15 +49,13 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
                 Log::error($plugin->getPluginName() . "fork thread failed!");
             } elseif ($pids[$key]) {
                 pcntl_waitpid($pids[$key], $status);
-                exit();
+                break;
             } else {
                 echo $plugin->getPluginName(), "\n";
                 $this->onListener($plugin);
-                break;
             }
         }
         $this->block = false;
-
 
     }
 
@@ -140,7 +138,6 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
     {
         return $this->notify();
     }
-
 
     public function onRequest($content)
     {
