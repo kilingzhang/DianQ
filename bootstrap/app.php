@@ -3,7 +3,6 @@
 
 use App\Core\CoolQ;
 use App\Support\Log;
-use CoolQSDK\Response;
 
 Log::setLoggerName(getenv('APP_NAME'));
 Log::setLoggerPath(LOG_PATH);
@@ -43,9 +42,9 @@ $app->setDiscussWhiteList($discussWhiteList);
 $app->setDiscussBlackList($discussBlackList);
 
 
-$app->attach(new \App\Plugin\TulingPlugin());
-$app->attach(new \App\Plugin\GongGongPlugin());
-//$app->attach(new \App\Plugin\MusicPlugin());
+//$app->attach(new \App\Plugins\TulingPlugin());
+$app->attach(new \App\Plugins\GongGongPlugin());
+//$app->attach(new \App\Plugins\MusicPlugin());
 
 
 return $app;
