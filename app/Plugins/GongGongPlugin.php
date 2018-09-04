@@ -6,11 +6,11 @@
  * Time: 22:19
  */
 
-namespace App\Plugin;
+namespace App\Plugins;
 
 
 use App\Core\BasePlugin;
-use App\Order\GroupIncreaseNoticeOrder;
+use App\Orders\GroupIncreaseNoticeOrder;
 
 class GongGongPlugin extends BasePlugin
 {

@@ -6,8 +6,6 @@
  * Time: 2:02
  */
 
-use App\Support\Log;
-use App\Support\Time;
 use Dotenv\Dotenv;
 
 define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);

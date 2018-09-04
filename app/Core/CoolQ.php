@@ -11,7 +11,6 @@ namespace App\Core;
 
 use App\Support\Log;
 use App\Support\Time;
-use CoolQSDK\Response;
 
 class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
 {
@@ -43,15 +42,16 @@ class CoolQ extends \CoolQSDK\CoolQ implements PluginSubject
 
         $pids = array();
         foreach (self::$plugins as $key => $plugin) {
-
-            $pids[$key] = pcntl_fork();
+            $pids[$key] = 0;
+            if ($this->isUseWs()) {
+                $pids[$key] = pcntl_fork();
+            }
             if ($pids[$key] == -1) {
                 Log::error($plugin->getPluginName() . "fork thread failed!");
             } elseif ($pids[$key]) {
                 pcntl_waitpid($pids[$key], $status);
                 break;
             } else {
-                echo $plugin->getPluginName(), "\n";
                 $this->onListener($plugin);
             }
         }

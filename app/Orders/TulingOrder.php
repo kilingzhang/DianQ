@@ -6,7 +6,7 @@
  * Time: 1:22
  */
 
-namespace App\Order;
+namespace App\Orders;
 
 
 use App\Core\BaseOrder;
