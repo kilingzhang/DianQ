@@ -10,7 +10,7 @@ namespace App\Orders;
 
 
 use App\Core\BaseOrder;
-use CoolQSDK\CoolQ;
+use Kilingzhang\QQ\Core\QQ;
 
 class RequestOrder extends BaseOrder
 {
@@ -19,7 +19,7 @@ class RequestOrder extends BaseOrder
     {
     }
 
-    public function run(CoolQ $coolQ, array $content)
+    public function run(QQ $QQ, array $content)
     {
     }
 }

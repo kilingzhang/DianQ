@@ -12,11 +12,11 @@ namespace App\Orders;
 use App\Core\BaseOrder;
 use App\Support\Log;
 use App\Support\Time;
-use CoolQSDK\CoolQ;
-use CoolQSDK\CQ;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Kilingzhang\QQ\Core\CQ;
+use Kilingzhang\QQ\Core\QQ;
 
 class TulingOrder extends BaseOrder
 {
@@ -54,14 +54,14 @@ class TulingOrder extends BaseOrder
         return 'TulingOrder';
     }
 
-    public function run(CoolQ $coolQ, array $content)
+    public function run(QQ $QQ, array $content)
     {
         switch ($content['message_type']) {
             //私聊消息
             case "private":
 
                 if (empty($this->apiKey)) {
-                    $coolQ->sendPrivateMsg($content['user_id'], 'No ApiKey');
+                    $QQ->sendPrivateMsg($content['user_id'], 'No ApiKey');
                     return;
                 }
 
@@ -72,23 +72,18 @@ class TulingOrder extends BaseOrder
                     return;
                 }
 
-                $coolQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
+                $QQ->sendPrivateMsg($content['user_id'], $data['results'][0]['values']['text']);
 
                 break;
             //群消息
             case "group":
 
                 if (self::getSelfQq() == null) {
-                    $loginInfo = json_decode($coolQ->getLoginInfo(), true);
-                    if ($loginInfo['retcode'] !== 0) {
-                        $coolQ->sendGroupMsg($content['group_id'], '机器人信息获取失败');
-                        return;
-                    }
-                    self::setSelfQq($loginInfo['data']['user_id']);
+                    $QQ->sendGroupMsg($content['group_id'], 'No Self QQ');
                 }
 
                 if (empty($this->apiKey)) {
-                    $coolQ->sendGroupMsg($content['group_id'], 'No ApiKey');
+                    $QQ->sendGroupMsg($content['group_id'], 'No ApiKey');
                     return;
                 }
 
@@ -102,8 +97,8 @@ class TulingOrder extends BaseOrder
                         //TODO: 返回空值做处理
                         return;
                     }
-                    if($content['user_id'] == 1353693508){
-                        $coolQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
+                    if ($content['user_id'] == 1353693508) {
+                        $QQ->sendGroupMsg($content['group_id'], CQ::At($content['user_id']) . "\n" . $data['results'][0]['values']['text']);
                     }
 
                 }
@@ -118,7 +113,7 @@ class TulingOrder extends BaseOrder
 
 
                 if (empty($this->apiKey)) {
-                    $coolQ->sendDiscussMsg($content['discuss_id'], 'No ApiKey');
+                    $QQ->sendDiscussMsg($content['discuss_id'], 'No ApiKey');
                     return;
                 }
 
@@ -130,8 +125,8 @@ class TulingOrder extends BaseOrder
                     return;
                 }
 
-                if($content['user_id']){
-                    $coolQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
+                if ($content['user_id']) {
+                    $QQ->sendDiscussMsg($content['discuss_id'], $data['results'][0]['values']['text']);
                 }
                 // {"reply":"message","block": true,"at_sender":true}
                 break;

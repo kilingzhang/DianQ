@@ -30,96 +30,28 @@ namespace App\Core;
 
 use App\Support\Log;
 use App\Support\Time;
+use Kilingzhang\QQ\Core\QQ;
 
 abstract class BasePlugin implements PluginObserver
 {
-    public $Intercept;
-    private $startTime;
-    public $coolQ;
     protected $messageOrders = [];
     protected $eventOrders = [];
     protected $requestOrders = [];
     protected $otherOrders = [];
 
+    /**
+     * @var QQ
+     */
+    protected $QQ = null;
+
     abstract public function getPluginName();
 
     public function __construct()
     {
-        $this->Intercept = false;
-
-        if (isset($this->coolQ)) {
-            $this->coolQ->block = $this->Intercept;
-        }
-
         $this->initOrders();
     }
 
     public abstract function initOrders();
-
-    public function __destruct()
-    {
-
-    }
-
-    public function onMessage(CoolQ $coolQ)
-    {
-        $this->coolQ = $coolQ;
-        $this->startTime = Time::getMicrotime();
-        $resopnse = $this->message($this->coolQ->getContent());
-        $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
-        return $resopnse;
-    }
-
-    public function onEvent(CoolQ $coolQ)
-    {
-        $this->coolQ = $coolQ;
-        $this->startTime = Time::getMicrotime();
-        $resopnse = $this->event($this->coolQ->getContent());
-        $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
-        return $resopnse;
-    }
-
-    public function onRequest(CoolQ $coolQ)
-    {
-        $this->coolQ = $coolQ;
-        $this->startTime = Time::getMicrotime();
-        $resopnse = $this->request($this->coolQ->getContent());
-        $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
-        return $resopnse;
-    }
-
-    public function onOther(CoolQ $coolQ)
-    {
-        $this->coolQ = $coolQ;
-        $this->startTime = Time::getMicrotime();
-        $resopnse = $this->other($this->coolQ->getContent());
-        $times = Time::ComMicritime($this->startTime, Time::getMicrotime());
-        Log::debug($this->getPluginName() . '->' . __FUNCTION__ . ' 共耗时：' . $times . '秒', [$times]);
-        return $resopnse;
-    }
-
-    /**
-     * @param bool $bool
-     */
-    public function setIntercept($bool = true)
-    {
-        $this->Intercept = $bool;
-
-        if (isset($this->coolQ)) {
-            $this->coolQ->block = $this->Intercept;
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIntercept()
-    {
-        return $this->Intercept;
-    }
 
     public function attach(string $type, BaseOrder $order)
     {
@@ -187,52 +119,66 @@ abstract class BasePlugin implements PluginObserver
         Log::debug($order->getOrderName() . '  命令已卸载');
     }
 
-    public function runMessageOrders()
+    public function QQ()
     {
-        foreach ($this->messageOrders as $order) {
-            $order->run($this->coolQ, $this->coolQ->getContent());
-        }
+        return $this->QQ;
     }
 
-    public function runEventOrders()
+    public function onMessage(QQ $QQ)
     {
-        foreach ($this->eventOrders as $order) {
-            $order->run($this->coolQ, $this->coolQ->getContent());
-        }
+        $this->QQ = $QQ;
+        $content = $this->QQ()->getContent();
+        $this->message($content);
     }
 
-    public function runRequestOrders()
+    public function onNotice(QQ $QQ)
     {
-        foreach ($this->requestOrders as $order) {
-            $order->run($this->coolQ, $this->coolQ->getContent());
-        }
+        $this->QQ = $QQ;
+        $content = $this->QQ()->getContent();
+        $this->notice($content);
     }
 
-    public function runOtherOrders()
+    public function onRequest(QQ $QQ)
     {
-        foreach ($this->otherOrders as $order) {
-            $order->run($this->coolQ, $this->coolQ->getContent());
-        }
+        $this->QQ = $QQ;
+        $content = $this->QQ()->getContent();
+        $this->request($content);
+    }
+
+    public function onOther(QQ $QQ)
+    {
+        $this->QQ = $QQ;
+        $content = $this->QQ()->getContent();
+        $this->other($content);
     }
 
     public function message(array $content)
     {
-        $this->runMessageOrders();
+        foreach ($this->messageOrders as $order) {
+            $order->run($this->QQ(), $content);
+        }
     }
 
-    public function event(array $content)
+    public function notice(array $content)
     {
-        $this->runEventOrders();
+        foreach ($this->eventOrders as $order) {
+            $order->run($this->QQ(), $content);
+        }
     }
 
     public function request(array $content)
     {
-        $this->runRequestOrders();
+        foreach ($this->requestOrders as $order) {
+            $order->run($this->QQ(), $content);
+        }
     }
 
     public function other(array $content)
     {
-        $this->runOtherOrders();
+        foreach ($this->otherOrders as $order) {
+            $order->run($this->QQ(), $content);
+        }
     }
+
 
 }

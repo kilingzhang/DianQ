@@ -9,11 +9,11 @@
 namespace App\Core;
 
 
-use CoolQSDK\CoolQ;
+use Kilingzhang\QQ\Core\QQ;
 
 abstract class BaseOrder
 {
     public abstract function getOrderName();
 
-    public abstract function run(CoolQ $coolQ, array $content);
+    public abstract function run(QQ $QQ, array $content);
 }

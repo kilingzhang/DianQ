@@ -24,4 +24,6 @@ class GongGongPlugin extends BasePlugin
     {
         $this->attach('event',new GroupIncreaseNoticeOrder());
     }
+
+
 }

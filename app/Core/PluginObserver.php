@@ -15,7 +15,7 @@ interface PluginObserver
     public function message(array $content);
 
     //notice
-    public function event(array $content);
+    public function notice(array $content);
 
     public function request(array $content);
 

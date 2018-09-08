@@ -10,12 +10,10 @@ namespace App\Orders;
 
 
 use App\Core\BaseOrder;
-use App\Support\Msg;
-use CoolQSDK\CoolQ;
-use CoolQSDK\CQ;
-use CoolQSDK\Response;
+use Kilingzhang\QQ\Core\CQ;
+use Kilingzhang\QQ\Core\QQ;
 
-class GroupIncreaseNoticeOrder extends BaseOrder
+class   GroupIncreaseNoticeOrder extends BaseOrder
 {
 
     public function getOrderName()
@@ -24,9 +22,9 @@ class GroupIncreaseNoticeOrder extends BaseOrder
     }
 
 
-    public function run(CoolQ $coolQ, array $content)
+    public function run(QQ $QQ, array $content)
     {
-
+        $content = [];
         $event = $content['event'];//兼容4.0
         switch ($event) {
             //群管理员变动
@@ -66,18 +64,7 @@ class GroupIncreaseNoticeOrder extends BaseOrder
                     'operator_id' => $content['operator_id'],
                 ];
 
-                $coolQ->sendGroupMsgAsync($content['group_id'], CQ::at($content['user_id']) . "\n" . $this->getGongGongGroupIncreaseNotice(), false);
-
-                if ($coolQ->isWhiteList() && !in_array($content['group_id'], $coolQ->getGroupWhiteList())) {
-                    return Response::banAccountError();
-                }
-
-                if (!$coolQ->isWhiteList() && $coolQ->isBlackList() && in_array($content['group_id'], $coolQ->getGroupBlackList())) {
-                    return Response::banAccountError();
-                }
-
-                $coolQ->sendPrivateMsgAsync($content['user_id'], $this->getGongGongGroupIncreaseNotice(), false);
-
+                $QQ->sendGroupMsgAsync($content['group_id'], CQ::at($content['user_id']) . "\n" . $this->getGongGongGroupIncreaseNotice(), false);
 
                 break;
             //群文件上传
